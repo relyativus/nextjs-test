@@ -1,0 +1,18 @@
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: next_test
+      MYSQL_DATABASE: next_demo
+      MYSQL_USER: next
+      MYSQL_PASSWORD: next_test
+    command: --local-infile=1
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db_data:/var/lib/mysql
+      - ./db_schema:/docker-entrypoint-initdb.d
