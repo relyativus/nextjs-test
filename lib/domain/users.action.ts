@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { CreateUserSchema, User, UserSchema } from "./user";
 import { ValidationState } from "./validation.state";
-import { executeQuery, insertBulk } from "../infra/db/query.executor";
 import { ZodError } from "zod";
 import { RowDataPacket } from "mysql2";
 
@@ -13,6 +12,7 @@ import { RowDataPacket } from "mysql2";
  * @returns list of users
  */
 export async function getUsers(): Promise<User[]> {
+  const { executeQuery } = await import("@/lib/infra/db/query.executor");
   const results = await executeQuery("SELECT * FROM users", []);
   return results.map((row) => mapUserFromDbResult(row));
 }
@@ -51,6 +51,7 @@ export async function createUser(
 }
 
 export async function createUsersBulk(users: User[]) {
+  const { insertBulk } = await import("@/lib/infra/db/query.executor");
   await insertBulk(
     "users",
     ["id", "name", "email", "created_at"],
@@ -64,14 +65,22 @@ export async function createUsersBulk(users: User[]) {
 }
 
 export async function deleteAll() {
+  const { executeQuery } = await import("@/lib/infra/db/query.executor");
   await executeQuery("TRUNCATE users", {});
   revalidatePath("/");
 }
 
 export async function getUserById(id: number) {
+  const { executeQuery } = await import("@/lib/infra/db/query.executor");
   return executeQuery("SELECT * FROM users where id=:id", { id }).then((rows) =>
     mapUserFromDbResult(rows[0])
   );
+}
+
+export async function fetchAllUniqueUserProperties() {
+  const { executeQuery } = await import("@/lib/infra/db/query.executor");
+  const users = await executeQuery("SELECT email, id FROM users", {});
+  return users.map((user) => ({ id: user.id, email: user.email }));
 }
 
 export async function updateUser(
@@ -91,6 +100,7 @@ export async function updateUser(
 }
 
 export async function deleteUser(id: number): Promise<void> {
+  const { executeQuery } = await import("@/lib/infra/db/query.executor");
   await executeQuery("DELETE FROM users WHERE id = :id", { id });
   revalidatePath("/");
 }
@@ -103,11 +113,13 @@ async function validateEmailUniqueness(
     ? "SELECT coalesce(COUNT(1),0) as count FROM users WHERE email = :email AND id <> :id"
     : "SELECT coalesce(COUNT(1),0) as count FROM users WHERE email = :email";
   const params = id ? { email, id } : { email };
+  const { executeQuery } = await import("@/lib/infra/db/query.executor");
   const result = await executeQuery(query, params);
   return result[0].count === 0;
 }
 
 async function updateUserInDatabase(user: User): Promise<void> {
+  const { executeQuery } = await import("@/lib/infra/db/query.executor");
   await executeQuery(
     "UPDATE users SET name = :name, email = :email, created_at = :createdAt WHERE id = :id",
     user
@@ -115,6 +127,7 @@ async function updateUserInDatabase(user: User): Promise<void> {
 }
 
 async function createUserInDatabase(user: UserFields): Promise<void> {
+  const { executeQuery } = await import("@/lib/infra/db/query.executor");
   await executeQuery(
     "INSERT INTO users (name, email, created_at) VALUES (:name, :email, :createdAt)",
     user

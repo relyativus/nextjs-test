@@ -19,21 +19,29 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 
-export function DeleteUser({ id }: { id: number }) {
-    const [open, setOpen] = useState(false)
+export function DeleteUser({
+  id,
+  onCompletion,
+}: {
+  id: number;
+  onCompletion: () => void;
+}) {
+  const [open, setOpen] = useState(false);
 
-    const handleDelete = async () => {
-        await deleteUser(id);
-        setOpen(false)
-        toast.success(`User ${id} deleted successfully`, {duration: 3000});
-    }
+  const handleDelete = async () => {
+    await deleteUser(id).then(() => {
+      setOpen(false);
+      onCompletion();
+      toast.success(`User ${id} deleted successfully`, { duration: 3000 });
+    });
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-         <Button variant={"destructive"} >
-          <TrashIcon  />
-          </Button>
+        <Button variant={"destructive"}>
+          <TrashIcon />
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -43,8 +51,14 @@ export function DeleteUser({ id }: { id: number }) {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel asChild><Button variant={"secondary"}>Cancel</Button></AlertDialogCancel>
-          <AlertDialogAction asChild><Button onClick={handleDelete} variant={"destructive"}>Confirm</Button></AlertDialogAction>
+          <AlertDialogCancel asChild>
+            <Button variant={"secondary"}>Cancel</Button>
+          </AlertDialogCancel>
+          <AlertDialogAction asChild>
+            <Button onClick={handleDelete} variant={"destructive"}>
+              Confirm
+            </Button>
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

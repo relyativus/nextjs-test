@@ -1,8 +1,7 @@
 "use server";
-import { executeQuery } from "@/lib/infra/db/query.executor";
 import * as XLSX from "xlsx";
 import { UserSchema } from "../user";
-import { createUsersBulk } from "../users.action";
+import { createUsersBulk, fetchAllUniqueUserProperties } from "../users.action";
 import { ExcelUser } from "./excel.user";
 
 /**
@@ -18,7 +17,7 @@ export async function convertExcelToUsers(
   const usersWorkbook = XLSX.read(file);
   const firstSheetName = usersWorkbook.SheetNames[0];
   const sheet = usersWorkbook.Sheets[firstSheetName];
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
+  {/* eslint-disable  @typescript-eslint/no-explicit-any */}
   const data = XLSX.utils.sheet_to_json<Record<string, any>>(sheet);
 
   const users = data.map((user) => ({
@@ -37,7 +36,7 @@ export async function convertExcelToUsers(
 async function prepareUniquenessValidationContext(
   users: { id: number; name: string; email: string; createdAt: string }[]
 ): Promise<UniquenessValidationCtx> {
-  const existingUsers = await fetchExistingUserProperties();
+  const existingUsers = await fetchAllUniqueUserProperties();
   const allEmails = existingUsers
     .map((user) => user.email)
     .concat(users.map((user) => user.email).filter((email) => email));
@@ -60,10 +59,7 @@ function aggregateOccurences(items: string[]): Map<string, number> {
   return result;
 }
 
-async function fetchExistingUserProperties() {
-  const users = await executeQuery("SELECT email, id FROM users", {});
-  return users.map((user) => ({ id: user.id, email: user.email }));
-}
+
 
 /**
  * Imports users extracted from excel into the database

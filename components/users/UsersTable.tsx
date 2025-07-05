@@ -1,3 +1,4 @@
+'use client'
 import {
   Table,
   TableBody,
@@ -5,13 +6,13 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { getUsers } from "@/lib/domain/users.action";
+import { User } from "@/lib/domain/user";
 import { formatDate } from "@/lib/utils";
 import { DeleteUser } from "./DeleteUser";
 import { UpdateUserDialog } from "./UpdateUserDialog";
 
-export default async function UsersTable() {
-  const users = await getUsers();
+export default function UsersTable({users, onCompletion}: {users: User[] | undefined, onCompletion: () => void }) {
+
   return (
     
       <Table>
@@ -24,7 +25,7 @@ export default async function UsersTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => (
+          {users?.map((user) => (
             <TableRow key={user.id}>
               <TableCell className="flex items-center gap-2">
                 {user.id}
@@ -34,8 +35,8 @@ export default async function UsersTable() {
               <TableCell>{formatDate(user.createdAt)}</TableCell>
               <TableCell className="text-right">
                 <div className="pd-2 flex items-center justify-end gap-2">
-                  <UpdateUserDialog key={`update_${user.id}`} id={user.id} />
-                  <DeleteUser key={`delete_${user.id}`} id={user.id} />
+                  <UpdateUserDialog key={`update_${user.id}`} id={user.id} onCompletion={onCompletion} />
+                  <DeleteUser key={`delete_${user.id}`} id={user.id} onCompletion={onCompletion} />
                 </div>
               </TableCell>
             </TableRow>

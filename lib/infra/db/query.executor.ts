@@ -3,7 +3,7 @@ import mysql, { QueryResult, RowDataPacket } from "mysql2/promise";
 
 let sharedPool: mysql.Pool;
 
-async function getPool() {
+function getPool() {
   if (!sharedPool) {
     sharedPool = mysql.createPool({
       uri: `mysql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`,
@@ -18,7 +18,7 @@ export async function executeQuery(
   /* eslint-disable  @typescript-eslint/no-explicit-any */
   params: any
 ): Promise<RowDataPacket[]> {
-  const pool = await getPool()
+  const pool = getPool()
   return pool.execute<RowDataPacket[]>(query, params).then(([rows]) => rows);
 }
 
@@ -31,7 +31,7 @@ export async function insertBulk(
     ","
   )})`;
 
-  const pool = await getPool()
+  const pool = getPool()
   return pool
     .query<QueryResult>({
       sql,

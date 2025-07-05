@@ -21,7 +21,7 @@ import {
 import { Input } from "../ui/input";
 import UserFields from "./UserFields";
 
-export function UpdateUserDialog({ id }: { id: number }) {
+export function UpdateUserDialog({ id, onCompletion }: { id: number, onCompletion: () => void }) {
   const validationState: ValidationState = {
     success: true,
     message: "",
@@ -38,6 +38,7 @@ export function UpdateUserDialog({ id }: { id: number }) {
       toast.success(`User ${formData.get("name")} updated successfully`, {
         duration: 3000,
       });
+      onCompletion()
       return { success: true, errors: {} };
     }
     return result;
