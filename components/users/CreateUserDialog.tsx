@@ -14,7 +14,7 @@ import { createUser } from "@/lib/domain/users.action";
 import { useActionState, useState } from "react";
 import { toast } from "sonner";
 
-export default function CreateUserDialog() {
+export default function CreateUserDialog({onCompletion}: {onCompletion: () => void}) {
   const validationState = {
     user: {},
     executionResult: {
@@ -32,6 +32,7 @@ export default function CreateUserDialog() {
       toast.success(`User ${formData.get("name")} created successfully`, {
         duration: 3000,
       });
+      onCompletion()
       return { user: {}, executionResult: { success: true, errors: {} } };
     } else {
       return {

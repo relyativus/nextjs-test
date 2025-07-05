@@ -1,5 +1,6 @@
 'use client'
 import { Button } from "@/components/ui/button";
+import CreateUserDialog from "@/components/users/CreateUserDialog";
 import UserDialog from "@/components/users/CreateUserDialog";
 import { DeleteAll } from "@/components/users/DeleteAll";
 
@@ -20,7 +21,7 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-end w-full">
-        <UserDialog />
+        <CreateUserDialog onCompletion={triggerRefresh} />
         <Button variant="secondary" asChild>
           <Link href="/excel">
             <UploadIcon />
