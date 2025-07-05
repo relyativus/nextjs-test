@@ -1,7 +1,6 @@
 'use client'
 import { Button } from "@/components/ui/button";
 import CreateUserDialog from "@/components/users/CreateUserDialog";
-import UserDialog from "@/components/users/CreateUserDialog";
 import { DeleteAll } from "@/components/users/DeleteAll";
 
 import UsersTable from "@/components/users/UsersTable";
